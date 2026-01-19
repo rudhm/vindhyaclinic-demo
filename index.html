@@ -1,856 +1,894 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Phone, 
-  MapPin, 
-  Calendar, 
-  Menu, 
-  X, 
-  Sparkles, 
-  Smile, 
-  ArrowRight, 
-  Clock, 
-  CheckCircle,
-  Instagram,
-  Facebook,
-  MessageCircle,
-  Award,
-  FileText,
-  Globe,
-  Stethoscope,
-  Zap,
-  User,
-  ShieldCheck,
-  Activity,
-  Navigation,
-  Syringe,
-  Scissors
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Rashmi's Skin, Hair, Laser & Dental Clinic</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel (to interpret JSX) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div id="root"></div>
 
-const App = () => {
-  const [lang, setLang] = useState('en');
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [activeServiceTab, setActiveServiceTab] = useState('skin');
-  const [showCampPopup, setShowCampPopup] = useState(true);
-  const [showSundayBar, setShowSundayBar] = useState(true);
-  const [selectedDoctor, setSelectedDoctor] = useState(null);
+    <script type="text/babel">
+        const { useState, useEffect } = React;
 
-  // Content Dictionary
-  const content = {
-    en: {
-      nav: {
-        home: "Home",
-        doctors: "Doctors",
-        services: "Services",
-        tech: "Technology",
-        community: "Community",
-        contact: "Contact",
-        book: "Book Now"
-      },
-      hero: {
-        title: "World-Class Skin, Hair & Dental Care",
-        subtitle: "Advanced Dermatology & Specialized Dentistry under one roof in Maihar & Satna.",
-        cta_skin: "Skin Treatments",
-        cta_dental: "Dental Care",
-        camp_alert: "Free Consultation Camp: 8th Dec 2025 - Register Now!",
-        badges: [
-          "🥇 Maihar's First Female Skin Doctor",
-          "🥇 Vindhya's Only MDS Endodontist",
-          "🌍 FMC Germany Certified"
-        ]
-      },
-      symptoms: {
-        title: "What Is Troubling You?",
-        items: [
-          { icon: <User />, label: "White Spots / Safed Daag", type: "skin" },
-          { icon: <Scissors />, label: "Hair Fall / Ganjapan", type: "skin" },
-          { icon: <Zap />, label: "Tooth Pain / Danton ka Dard", type: "dental" },
-          { icon: <Sparkles />, label: "Acne / Muhase", type: "skin" },
-          { icon: <Smile />, label: "Crooked Teeth / Tedhe-Medhe Daant", type: "dental" }
-        ]
-      },
-      trust_wall: {
-        title: "Certified Excellence",
-        subtitle: "Real qualifications. Real trust.",
-        certs: [
-          { title: "FMC Fellowship", issuer: "Medical Cosmetology, Germany", icon: <Globe /> },
-          { title: "MDS - Conservative Dentistry", issuer: "Gold Medalist", icon: <Award /> },
-          { title: "Oral Implantology", issuer: "Certificate of Completion (2020)", icon: <CheckCircle /> },
-          { title: "World No Tobacco Day", issuer: "Pledge Member", icon: <ShieldCheck /> }
-        ]
-      },
-      doctors: {
-        title: "Meet Our Specialists",
-        subtitle: "Click on a profile to view certifications and details.",
-        rashmi: {
-          id: 'rashmi',
-          name: "Dr. Rashmi Singh",
-          title: "Senior Homeopath & Cosmetologist",
-          image: "docter1.png",
-          qual: "B.H.M.S, CSD, FMC (Germany)",
-          spec: "Skin, Hair, Laser & Aesthetic Medicine",
-          bio: "Dr. Rashmi Singh combines holistic homeopathy with advanced aesthetic medicine. Her unique approach addresses skin issues from the root cause while utilizing modern laser technology for immediate cosmetic results.",
-          badges: [
-            { icon: <Globe className="w-4 h-4" />, text: "FMC Certified (Germany)", color: "bg-yellow-100 text-yellow-800 border-yellow-200" },
-            { icon: <Sparkles className="w-4 h-4" />, text: "Maihar's 1st Female Skin Dr", color: "bg-teal-100 text-teal-800 border-teal-200" }
-          ],
-          certificates: ["FMC Germany Certificate", "CSD Degree", "Aesthetic Laser Training"]
-        },
-        arunendra: {
-          id: 'arunendra',
-          name: "Dr. Arunendra Singh",
-          title: "Dental Surgeon & Implantologist",
-          image: "docter2.png",
-          qual: "BDS, MDS (Conservative Dentistry)",
-          spec: "Root Canal, Implants & Oral Cancer Specialist",
-          bio: "Specializing in Conservative Dentistry, Dr. Arunendra focuses on saving natural teeth through advanced Root Canal Treatments. He is also a certified specialist in Oral Cancer screening and Dental Implants.",
-          badges: [
-            { icon: <Award className="w-4 h-4" />, text: "MDS - Gold Medalist", color: "bg-blue-100 text-blue-800 border-blue-200" },
-            { icon: <Stethoscope className="w-4 h-4" />, text: "Oral Cancer Specialist", color: "bg-red-100 text-red-800 border-red-200" }
-          ],
-          certificates: ["MDS Degree", "Oral Cancer Certification", "FDI World Dental Fed (2023)"]
-        }
-      },
-      tech: {
-        title: "Advanced Technology Showcase",
-        items: [
-          { name: "Laser Helmet Therapy", desc: "For Hair Growth Regrowth", icon: <Zap /> },
-          { name: "PRP Therapy", desc: "Hair Loss & Skin Rejuvenation", icon: <Syringe /> },
-          { name: "Computerized X-Ray", desc: "Instant & Low Radiation", icon: <Activity /> },
-          { name: "Laser Gum Therapy", desc: "Bloodless & Painless", icon: <Sparkles /> }
-        ]
-      },
-      premium: {
-        title: "Premium Care",
-        braces: {
-          title: "Invisible Braces vs Metal",
-          aligner: "Clear Aligners",
-          metal: "Metal Braces",
-          feat1: "Invisible",
-          feat2: "Removable",
-          feat3: "No Dietary Restrictions"
-        },
-        wisdom: {
-          title: "Wisdom Tooth Surgery",
-          desc: "Painless surgical extraction with fast healing.",
-          badge: "Impacted Tooth Specialist (2021)"
-        }
-      },
-      services: {
-        title: "Specialized Treatment Hubs",
-        tab_skin: "Skin & Hair",
-        tab_dental: "Dental Care",
-        skin_list: [
-          "PRP Therapy (Hair & Skin)",
-          "Laser Helmet Therapy",
-          "Acne & Scar Treatment",
-          "Vitiligo (Safed Daag)",
-          "Micro-Needling",
-          "Tattoo Removal"
-        ],
-        dental_list: [
-          "Dental Implants",
-          "Smile Designing",
-          "Root Canal (RCT)",
-          "Invisible Braces",
-          "Oral Cancer Screening",
-          "Laser Gum Therapy"
-        ]
-      },
-      timeline: {
-        title: "Serving Maihar Since 2021",
-        events: [
-          { year: "Jan 2021", event: "First Free Health Camp" },
-          { year: "Mar 2022", event: "FLEXALIGN Certification" },
-          { year: "Dec 2023", event: "FDI World Dental Certificate" },
-          { year: "Dec 2025", event: "Upcoming Mega Camp" }
-        ]
-      },
-      locations: {
-        title: "Find Us - Two Locations",
-        maihar: {
-          name: "Maihar Branch",
-          addr: "Stadium ke samne, Jail Road, Maihar",
-          action: "Navigate to Stadium"
-        },
-        satna: {
-          name: "Satna Branch",
-          addr: "Bijli Office ke peeche, Circuit House Rd",
-          action: "Navigate to Hospital Branch"
-        },
-        hours: "Mon - Sat: 10:00 AM - 8:00 PM",
-        sunday: "We are Open This Sunday | रविवार को खुला है"
-      },
-      form: {
-        title: "Book Appointment",
-        name: "Name",
-        phone: "Phone",
-        btn: "Confirm Booking"
-      }
-    },
-    hi: {
-      nav: {
-        home: "होम",
-        doctors: "डॉक्टर्स",
-        services: "सेवाएं",
-        tech: "तकनीक",
-        community: "समुदाय",
-        contact: "संपर्क",
-        book: "बुकिंग करें"
-      },
-      hero: {
-        title: "विश्व स्तरीय त्वचा, बाल और दंत चिकित्सा",
-        subtitle: "मैहर और सतना में एक ही छत के नीचे उन्नत त्वचा विज्ञान और विशेष दंत चिकित्सा।",
-        cta_skin: "त्वचा उपचार",
-        cta_dental: "दंत चिकित्सा",
-        camp_alert: "निःशुल्क परामर्श शिविर: 8 दिसंबर 2025 - अभी पंजीकरण करें!",
-        badges: [
-          "🥇 मैहर की पहली महिला स्किन डॉक्टर",
-          "🥇 विंध्य के एकमात्र MDS एंडोडॉन्टिस्ट",
-          "🌍 FMC जर्मनी प्रमाणित"
-        ]
-      },
-      symptoms: {
-        title: "आपको क्या परेशानी है?",
-        items: [
-          { icon: <User />, label: "सफेद दाग / Vitiligo", type: "skin" },
-          { icon: <Scissors />, label: "बाल झड़ना / Ganjapan", type: "skin" },
-          { icon: <Zap />, label: "दांतों का दर्द / Tooth Pain", type: "dental" },
-          { icon: <Sparkles />, label: "मुंहासे / Acne", type: "skin" },
-          { icon: <Smile />, label: "टेढ़े-मेढ़े दांत / Crooked Teeth", type: "dental" }
-        ]
-      },
-      trust_wall: {
-        title: "प्रमाणित उत्कृष्टता",
-        subtitle: "असली योग्यता। असली विश्वास।",
-        certs: [
-          { title: "FMC फैलोशिप", issuer: "मेडिकल कॉस्मेटोलॉजी, जर्मनी", icon: <Globe /> },
-          { title: "MDS - दंत चिकित्सा", issuer: "स्वर्ण पदक विजेता", icon: <Award /> },
-          { title: "ओरल इम्प्लांटोलॉजी", issuer: "पूर्णता प्रमाण पत्र (2020)", icon: <CheckCircle /> },
-          { title: "तंबाकू निषेध दिवस", issuer: "शपथ सदस्य", icon: <ShieldCheck /> }
-        ]
-      },
-      doctors: {
-        title: "हमारे विशेषज्ञों से मिलें",
-        subtitle: "प्रमाणपत्र और विवरण देखने के लिए प्रोफ़ाइल पर क्लिक करें।",
-        rashmi: {
-          id: 'rashmi',
-          name: "डॉ. रश्मि सिंह",
-          title: "वरिष्ठ होम्योपैथ और कॉस्मेटोलॉजिस्ट",
-          image: "docter1.png",
-          qual: "B.H.M.S, CSD, FMC (जर्मनी)",
-          spec: "त्वचा, बाल, लेजर और सौंदर्य चिकित्सा",
-          bio: "डॉ. रश्मि सिंह उन्नत सौंदर्य चिकित्सा के साथ समग्र होम्योपैथी को जोड़ती हैं। उनका अनूठा दृष्टिकोण त्वचा की समस्याओं को जड़ से संबोधित करता है।",
-          badges: [
-            { icon: <Globe className="w-4 h-4" />, text: "FMC प्रमाणित (जर्मनी)", color: "bg-yellow-100 text-yellow-800 border-yellow-200" },
-            { icon: <Sparkles className="w-4 h-4" />, text: "मैहर की पहली महिला स्किन डॉक्टर", color: "bg-teal-100 text-teal-800 border-teal-200" }
-          ],
-          certificates: ["FMC जर्मनी प्रमाणपत्र", "CSD डिग्री", "एस्थेटिक लेजर प्रशिक्षण"]
-        },
-        arunendra: {
-          id: 'arunendra',
-          name: "डॉ. अरुणेंद्र सिंह",
-          title: "दंत सर्जन और इम्प्लांटोलॉजिस्ट",
-          image: "docter2.png",
-          qual: "BDS, MDS (कंजर्वेटिव डेंटिस्ट्री)",
-          spec: "रूट कैनाल, इम्प्लांट और मुख कैंसर विशेषज्ञ",
-          bio: "कंजर्वेटिव डेंटिस्ट्री में विशेषज्ञता रखने वाले डॉ. अरुणेंद्र उन्नत रूट कैनाल उपचार के माध्यम से प्राकृतिक दांतों को बचाने पर ध्यान केंद्रित करते हैं।",
-          badges: [
-            { icon: <Award className="w-4 h-4" />, text: "MDS - स्वर्ण पदक विजेता", color: "bg-blue-100 text-blue-800 border-blue-200" },
-            { icon: <Stethoscope className="w-4 h-4" />, text: "मुख कैंसर विशेषज्ञ", color: "bg-red-100 text-red-800 border-red-200" }
-          ],
-          certificates: ["MDS डिग्री", "मुख कैंसर प्रमाणन", "FDI वर्ल्ड डेंटल फेड (2023)"]
-        }
-      },
-      tech: {
-        title: "उन्नत तकनीक प्रदर्शन",
-        items: [
-          { name: "लेजर हेलमेट थेरेपी", desc: "बालों के विकास के लिए", icon: <Zap /> },
-          { name: "PRP थेरेपी", desc: "बाल झड़ना और त्वचा का कायाकल्प", icon: <Syringe /> },
-          { name: "कंप्यूटराइज्ड एक्स-रे", desc: "तत्काल और कम रेडिएशन", icon: <Activity /> },
-          { name: "लेजर गम थेरेपी", desc: "रक्तहीन और दर्द रहित", icon: <Sparkles /> }
-        ]
-      },
-      premium: {
-        title: "प्रीमियम देखभाल",
-        braces: {
-          title: "अदृश्य ब्रेसिज़ बनाम मेटल",
-          aligner: "क्लियर एलाइनर्स",
-          metal: "मेटल ब्रेसिज़",
-          feat1: "अदृश्य",
-          feat2: "हटाने योग्य",
-          feat3: "खाने की कोई पाबंदी नहीं"
-        },
-        wisdom: {
-          title: "अक्ल दाढ़ सर्जरी",
-          desc: "तेजी से ठीक होने के साथ दर्द रहित सर्जिकल निष्कर्षण।",
-          badge: "इम्पैक्टेड टूथ स्पेशलिस्ट (2021)"
-        }
-      },
-      services: {
-        title: "हमारे विशिष्ट उपचार",
-        tab_skin: "त्वचा और बाल",
-        tab_dental: "दंत चिकित्सा",
-        skin_list: [
-          "PRP थेरेपी (बाल और त्वचा)",
-          "लेजर हेलमेट थेरेपी",
-          "मुंहासे और निशान का इलाज",
-          "सफेद दाग (Vitiligo)",
-          "माइक्रो-नीडलिंग",
-          "टैटू हटाना"
-        ],
-        dental_list: [
-          "दंत प्रत्यारोपण (Implants)",
-          "स्माइल डिजाइनिंग",
-          "रूट कैनाल (RCT)",
-          "अदृश्य ब्रेसिज़",
-          "मुख कैंसर की जांच",
-          "लेजर गम थेरेपी"
-        ]
-      },
-      timeline: {
-        title: "2021 से मैहर की सेवा में",
-        events: [
-          { year: "Jan 2021", event: "पहला निःशुल्क स्वास्थ्य शिविर" },
-          { year: "Mar 2022", event: "FLEXALIGN प्रमाणन" },
-          { year: "Dec 2023", event: "FDI वर्ल्ड डेंटल सर्टिफिकेट" },
-          { year: "Dec 2025", event: "आगामी मेगा कैंप" }
-        ]
-      },
-      locations: {
-        title: "हमारे क्लीनिक - दो स्थान",
-        maihar: {
-          name: "मैहर शाखा",
-          addr: "स्टेडियम के सामने, जेल रोड, मैहर",
-          action: "स्टेडियम की ओर नेविगेट करें"
-        },
-        satna: {
-          name: "सतना शाखा",
-          addr: "बिजली ऑफिस के पीछे, सर्किट हाउस रोड",
-          action: "हॉस्पिटल ब्रांच की ओर नेविगेट करें"
-        },
-        hours: "सोम - शनि: सुबह 10:00 - रात 8:00",
-        sunday: "We are Open This Sunday | रविवार को खुला है"
-      },
-      form: {
-        title: "अपॉइंटमेंट बुक करें",
-        name: "नाम",
-        phone: "फोन",
-        btn: "पुष्टि करें"
-      }
-    }
-  };
+        // --- ICON COMPONENTS (Replaces lucide-react for Browser) ---
+        const IconWrapper = ({ children, className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                {children}
+            </svg>
+        );
 
-  const t = content[lang];
+        const Phone = (props) => <IconWrapper {...props}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.05 12.05 0 0 0 .57 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.05 12.05 0 0 0 2.81.57A2 2 0 0 1 22 16.92z"></path></IconWrapper>;
+        const MapPin = (props) => <IconWrapper {...props}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></IconWrapper>;
+        const Calendar = (props) => <IconWrapper {...props}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></IconWrapper>;
+        const Menu = (props) => <IconWrapper {...props}><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></IconWrapper>;
+        const X = (props) => <IconWrapper {...props}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></IconWrapper>;
+        const Sparkles = (props) => <IconWrapper {...props}><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></IconWrapper>;
+        const Smile = (props) => <IconWrapper {...props}><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></IconWrapper>;
+        const ArrowRight = (props) => <IconWrapper {...props}><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></IconWrapper>;
+        const Clock = (props) => <IconWrapper {...props}><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></IconWrapper>;
+        const CheckCircle = (props) => <IconWrapper {...props}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></IconWrapper>;
+        const Instagram = (props) => <IconWrapper {...props}><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></IconWrapper>;
+        const Facebook = (props) => <IconWrapper {...props}><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></IconWrapper>;
+        const MessageCircle = (props) => <IconWrapper {...props}><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></IconWrapper>;
+        const Award = (props) => <IconWrapper {...props}><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></IconWrapper>;
+        const FileText = (props) => <IconWrapper {...props}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></IconWrapper>;
+        const Globe = (props) => <IconWrapper {...props}><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></IconWrapper>;
+        const Stethoscope = (props) => <IconWrapper {...props}><path d="M4.8 2.3A.3.3 0 0 0 5 2.5h14a.2.2 0 0 0 .2-.2v-.2A.1.1 0 0 0 19 2H5a.1.1 0 0 0-.2.1v.2Z"></path><path d="M6 3v1a6 6 0 0 0 12 0V3"></path><path d="M12 10v4a8 8 0 0 1-8 8"></path><path d="M18 21a6 6 0 0 0-12 0v-1"></path></IconWrapper>;
+        const Zap = (props) => <IconWrapper {...props}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></IconWrapper>;
+        const User = (props) => <IconWrapper {...props}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></IconWrapper>;
+        const ShieldCheck = (props) => <IconWrapper {...props}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></IconWrapper>;
+        const Activity = (props) => <IconWrapper {...props}><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></IconWrapper>;
+        const Navigation = (props) => <IconWrapper {...props}><polygon points="3 11 22 2 13 21 11 13 3 11"></polygon></IconWrapper>;
+        const Syringe = (props) => <IconWrapper {...props}><path d="m18 2 4 4"></path><path d="m17 7 3-3"></path><path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5"></path><path d="m9 11 4 4"></path><path d="m5 19-3 3"></path><path d="m14 4 6 6"></path></IconWrapper>;
+        const Scissors = (props) => <IconWrapper {...props}><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></IconWrapper>;
 
-  return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-800 pb-16">
-      
-      {/* Top Banner (Camp) */}
-      {showCampPopup && (
-        <div className="bg-red-600 text-white px-4 py-2 text-sm md:text-base font-medium flex justify-between items-center relative z-50">
-          <div className="container mx-auto flex items-center justify-center gap-2 text-center">
-            <Calendar className="w-4 h-4" />
-            <span>{t.hero.camp_alert}</span>
-          </div>
-          <button onClick={() => setShowCampPopup(false)} className="text-white hover:text-red-200">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-      )}
+        // --- MAIN APP COMPONENT ---
+        const App = () => {
+          const [lang, setLang] = useState('en');
+          const [menuOpen, setMenuOpen] = useState(false);
+          const [activeServiceTab, setActiveServiceTab] = useState('skin');
+          const [showCampPopup, setShowCampPopup] = useState(true);
+          const [showSundayBar, setShowSundayBar] = useState(true);
+          const [selectedDoctor, setSelectedDoctor] = useState(null);
 
-      {/* Navigation */}
-      <nav className="sticky top-0 bg-white shadow-md z-40">
-        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          
-          {/* Logo */}
-          <div className="flex flex-col cursor-pointer" onClick={() => window.scrollTo(0,0)}>
-            <h1 className="text-2xl font-bold text-teal-700 leading-none">DR. RASHMI'S</h1>
-            <span className="text-[0.65rem] text-slate-500 font-bold tracking-widest uppercase">Skin, Hair, Laser & Dental</span>
-          </div>
-
-          {/* Desktop Menu */}
-          <div className="hidden lg:flex items-center gap-6 font-medium text-sm">
-            <a href="#home" className="hover:text-teal-600 transition">{t.nav.home}</a>
-            <a href="#symptoms" className="hover:text-teal-600 transition">Issues</a>
-            <a href="#doctors" className="hover:text-teal-600 transition">{t.nav.doctors}</a>
-            <a href="#services" className="hover:text-teal-600 transition">{t.nav.services}</a>
-            <a href="#tech" className="hover:text-teal-600 transition">{t.nav.tech}</a>
-            <a href="#locations" className="hover:text-teal-600 transition">{t.nav.locations}</a>
-            
-            <button 
-              onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
-              className="px-3 py-1 border border-slate-300 rounded-full text-xs font-bold hover:bg-slate-100 transition"
-            >
-              {lang === 'en' ? 'हिंदी' : 'English'}
-            </button>
-
-            <a href="#appointment" className="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-lg shadow-sm transition">
-              {t.nav.book}
-            </a>
-          </div>
-
-          {/* Mobile Menu Toggle */}
-          <div className="lg:hidden flex items-center gap-4">
-            <button 
-              onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
-              className="px-2 py-1 border border-slate-300 rounded text-xs font-bold"
-            >
-              {lang === 'en' ? 'HI' : 'EN'}
-            </button>
-            <button onClick={() => setMenuOpen(!menuOpen)} className="text-slate-700">
-              {menuOpen ? <X /> : <Menu />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Dropdown */}
-        {menuOpen && (
-          <div className="lg:hidden bg-white border-t border-slate-100 absolute w-full pb-4 shadow-lg">
-            <div className="flex flex-col p-4 gap-4 text-center">
-              <a href="#home" onClick={() => setMenuOpen(false)}>{t.nav.home}</a>
-              <a href="#doctors" onClick={() => setMenuOpen(false)}>{t.nav.doctors}</a>
-              <a href="#services" onClick={() => setMenuOpen(false)}>{t.nav.services}</a>
-              <a href="#tech" onClick={() => setMenuOpen(false)}>{t.nav.tech}</a>
-              <a href="#locations" onClick={() => setMenuOpen(false)}>{t.nav.locations}</a>
-              <a href="#appointment" onClick={() => setMenuOpen(false)} className="bg-teal-600 text-white py-2 rounded-lg">{t.nav.book}</a>
-            </div>
-          </div>
-        )}
-      </nav>
-
-      {/* Hero Section with Badges */}
-      <section id="home" className="relative bg-gradient-to-br from-teal-50 via-white to-blue-50 pt-12 pb-20 px-4">
-        <div className="container mx-auto flex flex-col md:flex-row items-center gap-12 relative z-10">
-          <div className="md:w-1/2 text-center md:text-left">
-            
-            {/* Authority Badges */}
-            <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-6">
-              {t.hero.badges.map((badge, idx) => (
-                <span key={idx} className="bg-yellow-100 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full border border-yellow-200 shadow-sm">
-                  {badge}
-                </span>
-              ))}
-            </div>
-
-            <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight mb-4">
-              {t.hero.title}
-            </h2>
-            <p className="text-lg text-slate-600 mb-8 max-w-lg mx-auto md:mx-0">
-              {t.hero.subtitle}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-              <button onClick={() => { setActiveServiceTab('skin'); document.getElementById('services').scrollIntoView(); }} className="flex items-center justify-center gap-2 bg-teal-600 text-white px-6 py-3 rounded-lg font-semibold shadow hover:bg-teal-700 transition transform hover:-translate-y-1">
-                <Sparkles className="w-5 h-5" /> {t.hero.cta_skin}
-              </button>
-              <button onClick={() => { setActiveServiceTab('dental'); document.getElementById('services').scrollIntoView(); }} className="flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow hover:bg-blue-700 transition transform hover:-translate-y-1">
-                <Smile className="w-5 h-5" /> {t.hero.cta_dental}
-              </button>
-            </div>
-          </div>
-          
-          <div className="md:w-1/2 w-full">
-            <div className="bg-white p-4 rounded-3xl shadow-xl relative overflow-hidden h-64 md:h-80 w-full flex border-4 border-white">
-               <div className="w-1/2 bg-teal-50 flex flex-col items-center justify-center border-r border-slate-100">
-                  <div className="bg-teal-100 p-4 rounded-full mb-4 animate-pulse">
-                    <Sparkles className="w-12 h-12 text-teal-600" />
-                  </div>
-                  <h3 className="font-bold text-teal-800 text-xl">Skin & Laser</h3>
-                </div>
-                <div className="w-1/2 bg-blue-50 flex flex-col items-center justify-center">
-                  <div className="bg-blue-100 p-4 rounded-full mb-4 animate-pulse">
-                    <Smile className="w-12 h-12 text-blue-600" />
-                  </div>
-                  <h3 className="font-bold text-blue-800 text-xl">Dental Care</h3>
-                </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Symptom Grid (What Is Troubling You?) */}
-      <section id="symptoms" className="py-12 bg-white -mt-10 relative z-20 rounded-t-3xl shadow-inner">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold text-center text-slate-800 mb-8">{t.symptoms.title}</h2>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {t.symptoms.items.map((item, idx) => (
-              <div key={idx} className={`flex flex-col items-center p-4 rounded-xl border transition hover:shadow-md cursor-pointer ${item.type === 'skin' ? 'bg-teal-50 border-teal-100 hover:bg-teal-100' : 'bg-blue-50 border-blue-100 hover:bg-blue-100'}`}>
-                <div className={`p-3 rounded-full mb-3 ${item.type === 'skin' ? 'bg-white text-teal-600' : 'bg-white text-blue-600'}`}>
-                  {item.icon}
-                </div>
-                <span className="text-sm font-semibold text-center text-slate-700 leading-tight">{item.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Trust Wall (Certificates) */}
-      <section className="py-16 bg-slate-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-slate-800">{t.trust_wall.title}</h2>
-            <p className="text-slate-500">{t.trust_wall.subtitle}</p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {t.trust_wall.certs.map((cert, idx) => (
-              <div key={idx} className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm flex flex-col items-center text-center hover:border-teal-400 transition">
-                <div className="text-slate-400 mb-4 scale-150">{cert.icon}</div>
-                <h3 className="font-bold text-slate-800 mb-1">{cert.title}</h3>
-                <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">{cert.issuer}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Doctors Section (Interactive) */}
-      <section id="doctors" className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-slate-800 mb-4">{t.doctors.title}</h2>
-            <p className="text-slate-500 mb-4">{t.doctors.subtitle}</p>
-            <div className="w-20 h-1 bg-teal-500 mx-auto rounded-full"></div>
-          </div>
-          <div className="grid md:grid-cols-2 gap-8 md:gap-12 max-w-5xl mx-auto">
-             {/* Dr. Rashmi Card */}
-            <div 
-              onClick={() => setSelectedDoctor(t.doctors.rashmi)}
-              className="group bg-slate-50 rounded-2xl p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2 cursor-pointer transition-all duration-300 flex flex-col items-center text-center relative overflow-hidden"
-            >
-              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-teal-400 to-teal-600 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-              <div className="w-32 h-32 bg-teal-200 rounded-full mb-6 overflow-hidden flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300 border-4 border-white">
-                <img 
-                  src={t.doctors.rashmi.image} 
-                  alt={t.doctors.rashmi.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {e.target.style.display='none'; e.target.parentNode.classList.add('flex', 'items-center', 'justify-center'); e.target.parentNode.innerHTML = '<span class="text-teal-700 text-3xl font-bold">DR</span>'}}
-                />
-              </div>
-              <h3 className="text-2xl font-bold text-slate-800 group-hover:text-teal-700 transition-colors">{t.doctors.rashmi.name}</h3>
-              <p className="text-teal-600 font-medium mb-2">{t.doctors.rashmi.title}</p>
-              <div className="bg-white px-4 py-2 rounded-lg border border-slate-200 text-sm text-slate-600 mt-2 shadow-sm">
-                <p className="font-semibold">{t.doctors.rashmi.qual}</p>
-              </div>
-              <div className="mt-4 flex gap-2 flex-wrap justify-center">
-                {t.doctors.rashmi.badges.slice(0,1).map((b,i) => (
-                   <span key={i} className="inline-flex items-center gap-1 bg-teal-50 text-teal-700 text-xs px-2 py-1 rounded-full border border-teal-100">
-                    {b.icon} {b.text}
-                  </span>
-                ))}
-              </div>
-              <button className="mt-6 text-teal-600 font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
-                View Profile <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Dr. Arunendra Card */}
-            <div 
-              onClick={() => setSelectedDoctor(t.doctors.arunendra)}
-              className="group bg-slate-50 rounded-2xl p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2 cursor-pointer transition-all duration-300 flex flex-col items-center text-center relative overflow-hidden"
-            >
-              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 to-blue-600 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-              <div className="w-32 h-32 bg-blue-200 rounded-full mb-6 overflow-hidden flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300 border-4 border-white">
-                <img 
-                  src={t.doctors.arunendra.image} 
-                  alt={t.doctors.arunendra.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {e.target.style.display='none'; e.target.parentNode.classList.add('flex', 'items-center', 'justify-center'); e.target.parentNode.innerHTML = '<span class="text-blue-700 text-3xl font-bold">DR</span>'}}
-                />
-              </div>
-              <h3 className="text-2xl font-bold text-slate-800 group-hover:text-blue-700 transition-colors">{t.doctors.arunendra.name}</h3>
-              <p className="text-blue-600 font-medium mb-2">{t.doctors.arunendra.title}</p>
-              <div className="bg-white px-4 py-2 rounded-lg border border-slate-200 text-sm text-slate-600 mt-2 shadow-sm">
-                <p className="font-semibold">{t.doctors.arunendra.qual}</p>
-              </div>
-               <div className="mt-4 flex gap-2 flex-wrap justify-center">
-                 {t.doctors.arunendra.badges.slice(0,1).map((b,i) => (
-                   <span key={i} className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded-full border border-blue-100">
-                    {b.icon} {b.text}
-                  </span>
-                ))}
-              </div>
-              <button className="mt-6 text-blue-600 font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
-                View Profile <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Technology Showcase */}
-      <section id="tech" className="py-16 bg-slate-900 text-white">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-            <div>
-              <h2 className="text-3xl font-bold mb-2">{t.tech.title}</h2>
-              <div className="w-16 h-1 bg-teal-500 rounded-full"></div>
-            </div>
-            {/* Virtual Tour Placeholder */}
-            <div className="text-sm font-medium bg-slate-800 px-4 py-2 rounded-lg flex items-center gap-2">
-              <Activity className="w-4 h-4 text-teal-400" /> Clinic Virtual Tour Coming Soon
-            </div>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {t.tech.items.map((item, idx) => (
-              <div key={idx} className="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-teal-500 transition group">
-                <div className="bg-slate-700 p-3 rounded-full w-fit mb-4 group-hover:bg-teal-500 transition-colors">
-                  {React.cloneElement(item.icon, { className: "w-6 h-6 text-white" })}
-                </div>
-                <h3 className="text-lg font-bold mb-1">{item.name}</h3>
-                <p className="text-slate-400 text-sm">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Services Tabs & Premium Differentiators */}
-      <section id="services" className="py-20 bg-slate-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-slate-800 mb-10">{t.services.title}</h2>
-          
-          <div className="flex justify-center mb-10">
-            <div className="bg-white p-1 rounded-xl shadow-sm inline-flex">
-              <button 
-                onClick={() => setActiveServiceTab('skin')}
-                className={`px-6 py-3 rounded-lg text-sm md:text-base font-semibold transition flex items-center gap-2 ${activeServiceTab === 'skin' ? 'bg-teal-600 text-white shadow' : 'text-slate-600 hover:bg-slate-50'}`}
-              >
-                <Sparkles className="w-4 h-4" /> {t.services.tab_skin}
-              </button>
-              <button 
-                onClick={() => setActiveServiceTab('dental')}
-                className={`px-6 py-3 rounded-lg text-sm md:text-base font-semibold transition flex items-center gap-2 ${activeServiceTab === 'dental' ? 'bg-blue-600 text-white shadow' : 'text-slate-600 hover:bg-slate-50'}`}
-              >
-                <Smile className="w-4 h-4" /> {t.services.tab_dental}
-              </button>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-16">
-            {activeServiceTab === 'skin' 
-              ? t.services.skin_list.map((item, idx) => (
-                  <div key={idx} className="bg-white p-5 rounded-xl border-l-4 border-teal-500 shadow-sm hover:shadow-md transition flex items-center gap-4">
-                    <CheckCircle className="w-5 h-5 text-teal-500 flex-shrink-0" />
-                    <span className="font-medium text-slate-700">{item}</span>
-                  </div>
-                ))
-              : t.services.dental_list.map((item, idx) => (
-                  <div key={idx} className="bg-white p-5 rounded-xl border-l-4 border-blue-500 shadow-sm hover:shadow-md transition flex items-center gap-4">
-                    <CheckCircle className="w-5 h-5 text-blue-500 flex-shrink-0" />
-                    <span className="font-medium text-slate-700">{item}</span>
-                  </div>
-                ))
+          // Content Dictionary
+          const content = {
+            en: {
+              nav: {
+                home: "Home",
+                doctors: "Doctors",
+                services: "Services",
+                tech: "Technology",
+                community: "Community",
+                contact: "Contact",
+                book: "Book Now"
+              },
+              hero: {
+                title: "World-Class Skin, Hair & Dental Care",
+                subtitle: "Advanced Dermatology & Specialized Dentistry under one roof in Maihar & Satna.",
+                cta_skin: "Skin Treatments",
+                cta_dental: "Dental Care",
+                camp_alert: "Free Consultation Camp: 8th Dec 2025 - Register Now!",
+                badges: [
+                  "🥇 Maihar's First Female Skin Doctor",
+                  "🥇 Vindhya's Only MDS Endodontist",
+                  "🌍 FMC Germany Certified"
+                ]
+              },
+              symptoms: {
+                title: "What Is Troubling You?",
+                items: [
+                  { icon: <User />, label: "White Spots / Safed Daag", type: "skin" },
+                  { icon: <Scissors />, label: "Hair Fall / Ganjapan", type: "skin" },
+                  { icon: <Zap />, label: "Tooth Pain / Danton ka Dard", type: "dental" },
+                  { icon: <Sparkles />, label: "Acne / Muhase", type: "skin" },
+                  { icon: <Smile />, label: "Crooked Teeth / Tedhe-Medhe Daant", type: "dental" }
+                ]
+              },
+              trust_wall: {
+                title: "Certified Excellence",
+                subtitle: "Real qualifications. Real trust.",
+                certs: [
+                  { title: "FMC Fellowship", issuer: "Medical Cosmetology, Germany", icon: <Globe /> },
+                  { title: "MDS - Conservative Dentistry", issuer: "Gold Medalist", icon: <Award /> },
+                  { title: "Oral Implantology", issuer: "Certificate of Completion (2020)", icon: <CheckCircle /> },
+                  { title: "World No Tobacco Day", issuer: "Pledge Member", icon: <ShieldCheck /> }
+                ]
+              },
+              doctors: {
+                title: "Meet Our Specialists",
+                subtitle: "Click on a profile to view certifications and details.",
+                rashmi: {
+                  id: 'rashmi',
+                  name: "Dr. Rashmi Singh",
+                  title: "Senior Homeopath & Cosmetologist",
+                  image: "docter1.png",
+                  qual: "B.H.M.S, CSD, FMC (Germany)",
+                  spec: "Skin, Hair, Laser & Aesthetic Medicine",
+                  bio: "Dr. Rashmi Singh combines holistic homeopathy with advanced aesthetic medicine. Her unique approach addresses skin issues from the root cause while utilizing modern laser technology for immediate cosmetic results.",
+                  badges: [
+                    { icon: <Globe className="w-4 h-4" />, text: "FMC Certified (Germany)", color: "bg-yellow-100 text-yellow-800 border-yellow-200" },
+                    { icon: <Sparkles className="w-4 h-4" />, text: "Maihar's 1st Female Skin Dr", color: "bg-teal-100 text-teal-800 border-teal-200" }
+                  ],
+                  certificates: ["FMC Germany Certificate", "CSD Degree", "Aesthetic Laser Training"]
+                },
+                arunendra: {
+                  id: 'arunendra',
+                  name: "Dr. Arunendra Singh",
+                  title: "Dental Surgeon & Implantologist",
+                  image: "docter2.png",
+                  qual: "BDS, MDS (Conservative Dentistry)",
+                  spec: "Root Canal, Implants & Oral Cancer Specialist",
+                  bio: "Specializing in Conservative Dentistry, Dr. Arunendra focuses on saving natural teeth through advanced Root Canal Treatments. He is also a certified specialist in Oral Cancer screening and Dental Implants.",
+                  badges: [
+                    { icon: <Award className="w-4 h-4" />, text: "MDS - Gold Medalist", color: "bg-blue-100 text-blue-800 border-blue-200" },
+                    { icon: <Stethoscope className="w-4 h-4" />, text: "Oral Cancer Specialist", color: "bg-red-100 text-red-800 border-red-200" }
+                  ],
+                  certificates: ["MDS Degree", "Oral Cancer Certification", "FDI World Dental Fed (2023)"]
+                }
+              },
+              tech: {
+                title: "Advanced Technology Showcase",
+                items: [
+                  { name: "Laser Helmet Therapy", desc: "For Hair Growth Regrowth", icon: <Zap /> },
+                  { name: "PRP Therapy", desc: "Hair Loss & Skin Rejuvenation", icon: <Syringe /> },
+                  { name: "Computerized X-Ray", desc: "Instant & Low Radiation", icon: <Activity /> },
+                  { name: "Laser Gum Therapy", desc: "Bloodless & Painless", icon: <Sparkles /> }
+                ]
+              },
+              premium: {
+                title: "Premium Care",
+                braces: {
+                  title: "Invisible Braces vs Metal",
+                  aligner: "Clear Aligners",
+                  metal: "Metal Braces",
+                  feat1: "Invisible",
+                  feat2: "Removable",
+                  feat3: "No Dietary Restrictions"
+                },
+                wisdom: {
+                  title: "Wisdom Tooth Surgery",
+                  desc: "Painless surgical extraction with fast healing.",
+                  badge: "Impacted Tooth Specialist (2021)"
+                }
+              },
+              services: {
+                title: "Specialized Treatment Hubs",
+                tab_skin: "Skin & Hair",
+                tab_dental: "Dental Care",
+                skin_list: [
+                  "PRP Therapy (Hair & Skin)",
+                  "Laser Helmet Therapy",
+                  "Acne & Scar Treatment",
+                  "Vitiligo (Safed Daag)",
+                  "Micro-Needling",
+                  "Tattoo Removal"
+                ],
+                dental_list: [
+                  "Dental Implants",
+                  "Smile Designing",
+                  "Root Canal (RCT)",
+                  "Invisible Braces",
+                  "Oral Cancer Screening",
+                  "Laser Gum Therapy"
+                ]
+              },
+              timeline: {
+                title: "Serving Maihar Since 2021",
+                events: [
+                  { year: "Jan 2021", event: "First Free Health Camp" },
+                  { year: "Mar 2022", event: "FLEXALIGN Certification" },
+                  { year: "Dec 2023", event: "FDI World Dental Certificate" },
+                  { year: "Dec 2025", event: "Upcoming Mega Camp" }
+                ]
+              },
+              locations: {
+                title: "Find Us - Two Locations",
+                maihar: {
+                  name: "Maihar Branch",
+                  addr: "Stadium ke samne, Jail Road, Maihar",
+                  action: "Navigate to Stadium"
+                },
+                satna: {
+                  name: "Satna Branch",
+                  addr: "Bijli Office ke peeche, Circuit House Rd",
+                  action: "Navigate to Hospital Branch"
+                },
+                hours: "Mon - Sat: 10:00 AM - 8:00 PM",
+                sunday: "We are Open This Sunday | रविवार को खुला है"
+              },
+              form: {
+                title: "Book Appointment",
+                name: "Name",
+                phone: "Phone",
+                btn: "Confirm Booking"
+              }
+            },
+            hi: {
+              nav: {
+                home: "होम",
+                doctors: "डॉक्टर्स",
+                services: "सेवाएं",
+                tech: "तकनीक",
+                community: "समुदाय",
+                contact: "संपर्क",
+                book: "बुकिंग करें"
+              },
+              hero: {
+                title: "विश्व स्तरीय त्वचा, बाल और दंत चिकित्सा",
+                subtitle: "मैहर और सतना में एक ही छत के नीचे उन्नत त्वचा विज्ञान और विशेष दंत चिकित्सा।",
+                cta_skin: "त्वचा उपचार",
+                cta_dental: "दंत चिकित्सा",
+                camp_alert: "निःशुल्क परामर्श शिविर: 8 दिसंबर 2025 - अभी पंजीकरण करें!",
+                badges: [
+                  "🥇 मैहर की पहली महिला स्किन डॉक्टर",
+                  "🥇 विंध्य के एकमात्र MDS एंडोडॉन्टिस्ट",
+                  "🌍 FMC जर्मनी प्रमाणित"
+                ]
+              },
+              symptoms: {
+                title: "आपको क्या परेशानी है?",
+                items: [
+                  { icon: <User />, label: "सफेद दाग / Vitiligo", type: "skin" },
+                  { icon: <Scissors />, label: "बाल झड़ना / Ganjapan", type: "skin" },
+                  { icon: <Zap />, label: "दांतों का दर्द / Tooth Pain", type: "dental" },
+                  { icon: <Sparkles />, label: "मुंहासे / Acne", type: "skin" },
+                  { icon: <Smile />, label: "टेढ़े-मेढ़े दांत / Crooked Teeth", type: "dental" }
+                ]
+              },
+              trust_wall: {
+                title: "प्रमाणित उत्कृष्टता",
+                subtitle: "असली योग्यता। असली विश्वास।",
+                certs: [
+                  { title: "FMC फैलोशिप", issuer: "मेडिकल कॉस्मेटोलॉजी, जर्मनी", icon: <Globe /> },
+                  { title: "MDS - दंत चिकित्सा", issuer: "स्वर्ण पदक विजेता", icon: <Award /> },
+                  { title: "ओरल इम्प्लांटोलॉजी", issuer: "पूर्णता प्रमाण पत्र (2020)", icon: <CheckCircle /> },
+                  { title: "तंबाकू निषेध दिवस", issuer: "शपथ सदस्य", icon: <ShieldCheck /> }
+                ]
+              },
+              doctors: {
+                title: "हमारे विशेषज्ञों से मिलें",
+                subtitle: "प्रमाणपत्र और विवरण देखने के लिए प्रोफ़ाइल पर क्लिक करें।",
+                rashmi: {
+                  id: 'rashmi',
+                  name: "डॉ. रश्मि सिंह",
+                  title: "वरिष्ठ होम्योपैथ और कॉस्मेटोलॉजिस्ट",
+                  image: "docter1.png",
+                  qual: "B.H.M.S, CSD, FMC (जर्मनी)",
+                  spec: "त्वचा, बाल, लेजर और सौंदर्य चिकित्सा",
+                  bio: "डॉ. रश्मि सिंह उन्नत सौंदर्य चिकित्सा के साथ समग्र होम्योपैथी को जोड़ती हैं। उनका अनूठा दृष्टिकोण त्वचा की समस्याओं को जड़ से संबोधित करता है।",
+                  badges: [
+                    { icon: <Globe className="w-4 h-4" />, text: "FMC प्रमाणित (जर्मनी)", color: "bg-yellow-100 text-yellow-800 border-yellow-200" },
+                    { icon: <Sparkles className="w-4 h-4" />, text: "मैहर की पहली महिला स्किन डॉक्टर", color: "bg-teal-100 text-teal-800 border-teal-200" }
+                  ],
+                  certificates: ["FMC जर्मनी प्रमाणपत्र", "CSD डिग्री", "एस्थेटिक लेजर प्रशिक्षण"]
+                },
+                arunendra: {
+                  id: 'arunendra',
+                  name: "डॉ. अरुणेंद्र सिंह",
+                  title: "दंत सर्जन और इम्प्लांटोलॉजिस्ट",
+                  image: "docter2.png",
+                  qual: "BDS, MDS (कंजर्वेटिव डेंटिस्ट्री)",
+                  spec: "रूट कैनाल, इम्प्लांट और मुख कैंसर विशेषज्ञ",
+                  bio: "कंजर्वेटिव डेंटिस्ट्री में विशेषज्ञता रखने वाले डॉ. अरुणेंद्र उन्नत रूट कैनाल उपचार के माध्यम से प्राकृतिक दांतों को बचाने पर ध्यान केंद्रित करते हैं।",
+                  badges: [
+                    { icon: <Award className="w-4 h-4" />, text: "MDS - स्वर्ण पदक विजेता", color: "bg-blue-100 text-blue-800 border-blue-200" },
+                    { icon: <Stethoscope className="w-4 h-4" />, text: "मुख कैंसर विशेषज्ञ", color: "bg-red-100 text-red-800 border-red-200" }
+                  ],
+                  certificates: ["MDS डिग्री", "मुख कैंसर प्रमाणन", "FDI वर्ल्ड डेंटल फेड (2023)"]
+                }
+              },
+              tech: {
+                title: "उन्नत तकनीक प्रदर्शन",
+                items: [
+                  { name: "लेजर हेलमेट थेरेपी", desc: "बालों के विकास के लिए", icon: <Zap /> },
+                  { name: "PRP थेरेपी", desc: "बाल झड़ना और त्वचा का कायाकल्प", icon: <Syringe /> },
+                  { name: "कंप्यूटराइज्ड एक्स-रे", desc: "तत्काल और कम रेडिएशन", icon: <Activity /> },
+                  { name: "लेजर गम थेरेपी", desc: "रक्तहीन और दर्द रहित", icon: <Sparkles /> }
+                ]
+              },
+              premium: {
+                title: "प्रीमियम देखभाल",
+                braces: {
+                  title: "अदृश्य ब्रेसिज़ बनाम मेटल",
+                  aligner: "क्लियर एलाइनर्स",
+                  metal: "मेटल ब्रेसिज़",
+                  feat1: "अदृश्य",
+                  feat2: "हटाने योग्य",
+                  feat3: "खाने की कोई पाबंदी नहीं"
+                },
+                wisdom: {
+                  title: "अक्ल दाढ़ सर्जरी",
+                  desc: "तेजी से ठीक होने के साथ दर्द रहित सर्जिकल निष्कर्षण।",
+                  badge: "इम्पैक्टेड टूथ स्पेशलिस्ट (2021)"
+                }
+              },
+              services: {
+                title: "हमारे विशिष्ट उपचार",
+                tab_skin: "त्वचा और बाल",
+                tab_dental: "दंत चिकित्सा",
+                skin_list: [
+                  "PRP थेरेपी (बाल और त्वचा)",
+                  "लेजर हेलमेट थेरेपी",
+                  "मुंहासे और निशान का इलाज",
+                  "सफेद दाग (Vitiligo)",
+                  "माइक्रो-नीडलिंग",
+                  "टैटू हटाना"
+                ],
+                dental_list: [
+                  "दंत प्रत्यारोपण (Implants)",
+                  "स्माइल डिजाइनिंग",
+                  "रूट कैनाल (RCT)",
+                  "अदृश्य ब्रेसिज़",
+                  "मुख कैंसर की जांच",
+                  "लेजर गम थेरेपी"
+                ]
+              },
+              timeline: {
+                title: "2021 से मैहर की सेवा में",
+                events: [
+                  { year: "Jan 2021", event: "पहला निःशुल्क स्वास्थ्य शिविर" },
+                  { year: "Mar 2022", event: "FLEXALIGN प्रमाणन" },
+                  { year: "Dec 2023", event: "FDI वर्ल्ड डेंटल सर्टिफिकेट" },
+                  { year: "Dec 2025", event: "आगामी मेगा कैंप" }
+                ]
+              },
+              locations: {
+                title: "हमारे क्लीनिक - दो स्थान",
+                maihar: {
+                  name: "मैहर शाखा",
+                  addr: "स्टेडियम के सामने, जेल रोड, मैहर",
+                  action: "स्टेडियम की ओर नेविगेट करें"
+                },
+                satna: {
+                  name: "सतना शाखा",
+                  addr: "बिजली ऑफिस के पीछे, सर्किट हाउस रोड",
+                  action: "हॉस्पिटल ब्रांच की ओर नेविगेट करें"
+                },
+                hours: "सोम - शनि: सुबह 10:00 - रात 8:00",
+                sunday: "We are Open This Sunday | रविवार को खुला है"
+              },
+              form: {
+                title: "अपॉइंटमेंट बुक करें",
+                name: "नाम",
+                phone: "फोन",
+                btn: "पुष्टि करें"
+              }
             }
-          </div>
+          };
 
-          {/* Premium Differentiators (Dental Specific usually) */}
-          {activeServiceTab === 'dental' && (
-            <div className="max-w-5xl mx-auto space-y-8 animate-in slide-in-from-bottom duration-500">
+          const t = content[lang];
+
+          return (
+            <div className="min-h-screen bg-slate-50 font-sans text-slate-800 pb-16">
               
-              {/* Braces Comparison */}
-              <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
-                <div className="bg-blue-600 p-4 text-white font-bold text-center">
-                  {t.premium.braces.title}
-                </div>
-                <div className="grid grid-cols-2 divide-x divide-slate-100">
-                  <div className="p-6 text-center">
-                    <div className="text-xl font-bold text-slate-800 mb-4">{t.premium.braces.aligner}</div>
-                    <ul className="space-y-3 text-sm text-slate-600">
-                      <li className="flex items-center justify-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> {t.premium.braces.feat1}</li>
-                      <li className="flex items-center justify-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> {t.premium.braces.feat2}</li>
-                      <li className="flex items-center justify-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> {t.premium.braces.feat3}</li>
-                    </ul>
+              {/* Top Banner (Camp) */}
+              {showCampPopup && (
+                <div className="bg-red-600 text-white px-4 py-2 text-sm md:text-base font-medium flex justify-between items-center relative z-50">
+                  <div className="container mx-auto flex items-center justify-center gap-2 text-center">
+                    <Calendar className="w-4 h-4" />
+                    <span>{t.hero.camp_alert}</span>
                   </div>
-                  <div className="p-6 text-center bg-slate-50 opacity-70">
-                    <div className="text-xl font-bold text-slate-500 mb-4">{t.premium.braces.metal}</div>
-                    <ul className="space-y-3 text-sm text-slate-400">
-                      <li className="flex items-center justify-center gap-2"><X className="w-4 h-4 text-red-400" /> Visible</li>
-                      <li className="flex items-center justify-center gap-2"><X className="w-4 h-4 text-red-400" /> Fixed</li>
-                      <li className="flex items-center justify-center gap-2"><X className="w-4 h-4 text-red-400" /> Diet Limits</li>
-                    </ul>
+                  <button onClick={() => setShowCampPopup(false)} className="text-white hover:text-red-200">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
+
+              {/* Navigation */}
+              <nav className="sticky top-0 bg-white shadow-md z-40">
+                <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+                  
+                  {/* Logo */}
+                  <div className="flex flex-col cursor-pointer" onClick={() => window.scrollTo(0,0)}>
+                    <h1 className="text-2xl font-bold text-teal-700 leading-none">DR. RASHMI'S</h1>
+                    <span className="text-[0.65rem] text-slate-500 font-bold tracking-widest uppercase">Skin, Hair, Laser & Dental</span>
+                  </div>
+
+                  {/* Desktop Menu */}
+                  <div className="hidden lg:flex items-center gap-6 font-medium text-sm">
+                    <a href="#home" className="hover:text-teal-600 transition">{t.nav.home}</a>
+                    <a href="#symptoms" className="hover:text-teal-600 transition">Issues</a>
+                    <a href="#doctors" className="hover:text-teal-600 transition">{t.nav.doctors}</a>
+                    <a href="#services" className="hover:text-teal-600 transition">{t.nav.services}</a>
+                    <a href="#tech" className="hover:text-teal-600 transition">{t.nav.tech}</a>
+                    <a href="#locations" className="hover:text-teal-600 transition">{t.nav.locations}</a>
+                    
+                    <button 
+                      onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
+                      className="px-3 py-1 border border-slate-300 rounded-full text-xs font-bold hover:bg-slate-100 transition"
+                    >
+                      {lang === 'en' ? 'हिंदी' : 'English'}
+                    </button>
+
+                    <a href="#appointment" className="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-lg shadow-sm transition">
+                      {t.nav.book}
+                    </a>
+                  </div>
+
+                  {/* Mobile Menu Toggle */}
+                  <div className="lg:hidden flex items-center gap-4">
+                    <button 
+                      onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
+                      className="px-2 py-1 border border-slate-300 rounded text-xs font-bold"
+                    >
+                      {lang === 'en' ? 'HI' : 'EN'}
+                    </button>
+                    <button onClick={() => setMenuOpen(!menuOpen)} className="text-slate-700">
+                      {menuOpen ? <X /> : <Menu />}
+                    </button>
                   </div>
                 </div>
-              </div>
 
-              {/* Wisdom Tooth & Laser Cards */}
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-red-50 p-6 rounded-2xl border border-red-100">
-                   <h3 className="text-lg font-bold text-red-900 mb-2">{t.premium.wisdom.title}</h3>
-                   <p className="text-red-700 text-sm mb-4">{t.premium.wisdom.desc}</p>
-                   <span className="bg-white text-red-600 text-xs font-bold px-3 py-1 rounded-full shadow-sm">{t.premium.wisdom.badge}</span>
-                </div>
-                <div className="bg-purple-50 p-6 rounded-2xl border border-purple-100">
-                   <h3 className="text-lg font-bold text-purple-900 mb-2">Oral Cancer Screening</h3>
-                   <p className="text-purple-700 text-sm mb-4">Life-saving preventive checks. FDI World Dental certified protocols.</p>
-                   <span className="bg-white text-purple-600 text-xs font-bold px-3 py-1 rounded-full shadow-sm">Early Detection Saves Lives</span>
-                </div>
-              </div>
-
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Community Timeline */}
-      <section className="py-16 bg-white border-y border-slate-100">
-         <div className="container mx-auto px-4 max-w-4xl">
-            <h2 className="text-2xl font-bold text-center mb-10">{t.timeline.title}</h2>
-            <div className="relative border-l-2 border-teal-200 ml-4 md:ml-0 md:pl-8 space-y-8">
-               {t.timeline.events.map((evt, idx) => (
-                 <div key={idx} className="relative pl-6 md:pl-0">
-                    <div className="absolute -left-[31px] md:-left-[41px] bg-teal-500 w-4 h-4 rounded-full border-4 border-white shadow"></div>
-                    <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4">
-                       <span className="text-sm font-bold text-teal-600 bg-teal-50 px-2 py-1 rounded w-fit">{evt.year}</span>
-                       <span className="text-lg font-medium text-slate-800">{evt.event}</span>
+                {/* Mobile Dropdown */}
+                {menuOpen && (
+                  <div className="lg:hidden bg-white border-t border-slate-100 absolute w-full pb-4 shadow-lg">
+                    <div className="flex flex-col p-4 gap-4 text-center">
+                      <a href="#home" onClick={() => setMenuOpen(false)}>{t.nav.home}</a>
+                      <a href="#doctors" onClick={() => setMenuOpen(false)}>{t.nav.doctors}</a>
+                      <a href="#services" onClick={() => setMenuOpen(false)}>{t.nav.services}</a>
+                      <a href="#tech" onClick={() => setMenuOpen(false)}>{t.nav.tech}</a>
+                      <a href="#locations" onClick={() => setMenuOpen(false)}>{t.nav.locations}</a>
+                      <a href="#appointment" onClick={() => setMenuOpen(false)} className="bg-teal-600 text-white py-2 rounded-lg">{t.nav.book}</a>
                     </div>
-                 </div>
-               ))}
-            </div>
-         </div>
-      </section>
+                  </div>
+                )}
+              </nav>
 
-      {/* Locations */}
-      <section id="locations" className="py-20 bg-slate-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-800">{t.locations.title}</h2>
-          </div>
-          <div className="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
-             {/* Maihar */}
-             <div className="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-teal-500">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="bg-teal-100 p-3 rounded-full"><MapPin className="text-teal-600" /></div>
-                  <div>
-                    <h3 className="text-xl font-bold">{t.locations.maihar.name}</h3>
-                    <p className="text-slate-600 font-medium">{t.locations.maihar.addr}</p>
+              {/* Hero Section with Badges */}
+              <section id="home" className="relative bg-gradient-to-br from-teal-50 via-white to-blue-50 pt-12 pb-20 px-4">
+                <div className="container mx-auto flex flex-col md:flex-row items-center gap-12 relative z-10">
+                  <div className="md:w-1/2 text-center md:text-left">
+                    
+                    {/* Authority Badges */}
+                    <div className="flex flex-wrap justify-center md:justify-start gap-2 mb-6">
+                      {t.hero.badges.map((badge, idx) => (
+                        <span key={idx} className="bg-yellow-100 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full border border-yellow-200 shadow-sm">
+                          {badge}
+                        </span>
+                      ))}
+                    </div>
+
+                    <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight mb-4">
+                      {t.hero.title}
+                    </h2>
+                    <p className="text-lg text-slate-600 mb-8 max-w-lg mx-auto md:mx-0">
+                      {t.hero.subtitle}
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                      <button onClick={() => { setActiveServiceTab('skin'); document.getElementById('services').scrollIntoView(); }} className="flex items-center justify-center gap-2 bg-teal-600 text-white px-6 py-3 rounded-lg font-semibold shadow hover:bg-teal-700 transition transform hover:-translate-y-1">
+                        <Sparkles className="w-5 h-5" /> {t.hero.cta_skin}
+                      </button>
+                      <button onClick={() => { setActiveServiceTab('dental'); document.getElementById('services').scrollIntoView(); }} className="flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow hover:bg-blue-700 transition transform hover:-translate-y-1">
+                        <Smile className="w-5 h-5" /> {t.hero.cta_dental}
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="md:w-1/2 w-full">
+                    <div className="bg-white p-4 rounded-3xl shadow-xl relative overflow-hidden h-64 md:h-80 w-full flex border-4 border-white">
+                       <div className="w-1/2 bg-teal-50 flex flex-col items-center justify-center border-r border-slate-100">
+                          <div className="bg-teal-100 p-4 rounded-full mb-4 animate-pulse">
+                            <Sparkles className="w-12 h-12 text-teal-600" />
+                          </div>
+                          <h3 className="font-bold text-teal-800 text-xl">Skin & Laser</h3>
+                        </div>
+                        <div className="w-1/2 bg-blue-50 flex flex-col items-center justify-center">
+                          <div className="bg-blue-100 p-4 rounded-full mb-4 animate-pulse">
+                            <Smile className="w-12 h-12 text-blue-600" />
+                          </div>
+                          <h3 className="font-bold text-blue-800 text-xl">Dental Care</h3>
+                        </div>
+                    </div>
                   </div>
                 </div>
-                <button className="w-full py-3 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 transition flex items-center justify-center gap-2">
-                  <Navigation className="w-4 h-4" /> {t.locations.maihar.action}
-                </button>
-             </div>
-             {/* Satna */}
-             <div className="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-blue-500">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="bg-blue-100 p-3 rounded-full"><MapPin className="text-blue-600" /></div>
-                  <div>
-                    <h3 className="text-xl font-bold">{t.locations.satna.name}</h3>
-                    <p className="text-slate-600 font-medium">{t.locations.satna.addr}</p>
-                  </div>
-                </div>
-                <button className="w-full py-3 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 transition flex items-center justify-center gap-2">
-                  <Navigation className="w-4 h-4" /> {t.locations.satna.action}
-                </button>
-             </div>
-          </div>
-        </div>
-      </section>
+              </section>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-slate-400 py-12 mb-10 md:mb-0">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">Dr. Rashmi's Clinic</h2>
-          <div className="flex justify-center gap-6 mb-8">
-            <a 
-              href="https://www.facebook.com/people/DRRASHMIs-Skin-Cosmetic-Hair-Laser-Dental-Clinic/100063725846182/" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="hover:text-white transition"
-              aria-label="Visit Facebook Page"
-            >
-              <Facebook />
-            </a>
-            <a href="#" className="hover:text-white transition" aria-label="Visit Instagram Page">
-              <Instagram />
-            </a>
-          </div>
-          <p className="text-sm">&copy; 2025 Dr. Rashmi's Clinic. All rights reserved.</p>
-        </div>
-      </footer>
-
-      {/* Sticky Sunday Bar */}
-      {showSundayBar && (
-        <div className="fixed bottom-0 left-0 w-full bg-green-700 text-white py-3 px-4 text-center font-bold z-50 flex justify-between items-center md:justify-center gap-4 shadow-lg">
-           <div className="flex items-center gap-2">
-             <Calendar className="w-5 h-5" /> {t.locations.sunday}
-           </div>
-           <button onClick={() => setShowSundayBar(false)} className="md:absolute md:right-4 opacity-80 hover:opacity-100">
-             <X className="w-5 h-5" />
-           </button>
-        </div>
-      )}
-
-      {/* Doctor Modal */}
-      {selectedDoctor && (
-        <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedDoctor(null)}></div>
-          <div className="relative bg-white w-full md:w-[700px] md:rounded-2xl rounded-t-2xl shadow-2xl max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom duration-300">
-            <div className="sticky top-0 bg-white border-b border-slate-100 p-4 flex justify-between items-center z-10">
-              <h3 className="text-lg font-bold text-slate-800">Physician Profile</h3>
-              <button onClick={() => setSelectedDoctor(null)} className="p-2 hover:bg-slate-100 rounded-full transition">
-                <X className="w-6 h-6 text-slate-500" />
-              </button>
-            </div>
-            <div className="p-6 md:p-8">
-              <div className="flex flex-col md:flex-row gap-6 items-center md:items-start mb-8">
-                <div className={`w-28 h-28 rounded-full flex-shrink-0 flex items-center justify-center text-3xl font-bold text-white shadow-lg overflow-hidden border-4 border-white ${selectedDoctor.id === 'rashmi' ? 'bg-teal-500' : 'bg-blue-600'}`}>
-                  <img 
-                    src={selectedDoctor.image} 
-                    alt={selectedDoctor.name} 
-                    className="w-full h-full object-cover"
-                    onError={(e) => {e.target.style.display='none'; e.target.parentNode.classList.add('flex', 'items-center', 'justify-center'); e.target.parentNode.innerHTML = selectedDoctor.name.split(" ")[1][0] + selectedDoctor.name.split(" ")[2][0]}}
-                  />
-                </div>
-                <div className="text-center md:text-left">
-                  <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">{selectedDoctor.name}</h2>
-                  <p className={`text-lg font-medium mb-1 ${selectedDoctor.id === 'rashmi' ? 'text-teal-600' : 'text-blue-600'}`}>{selectedDoctor.title}</p>
-                  <p className="text-slate-500">{selectedDoctor.qual}</p>
-                  <div className="flex flex-wrap gap-2 mt-4 justify-center md:justify-start">
-                    {selectedDoctor.badges.map((badge, idx) => (
-                      <span key={idx} className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${badge.color}`}>
-                        {badge.icon} {badge.text}
-                      </span>
+              {/* Symptom Grid (What Is Troubling You?) */}
+              <section id="symptoms" className="py-12 bg-white -mt-10 relative z-20 rounded-t-3xl shadow-inner">
+                <div className="container mx-auto px-4">
+                  <h2 className="text-2xl font-bold text-center text-slate-800 mb-8">{t.symptoms.title}</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    {t.symptoms.items.map((item, idx) => (
+                      <div key={idx} className={`flex flex-col items-center p-4 rounded-xl border transition hover:shadow-md cursor-pointer ${item.type === 'skin' ? 'bg-teal-50 border-teal-100 hover:bg-teal-100' : 'bg-blue-50 border-blue-100 hover:bg-blue-100'}`}>
+                        <div className={`p-3 rounded-full mb-3 ${item.type === 'skin' ? 'bg-white text-teal-600' : 'bg-white text-blue-600'}`}>
+                          {item.icon}
+                        </div>
+                        <span className="text-sm font-semibold text-center text-slate-700 leading-tight">{item.label}</span>
+                      </div>
                     ))}
                   </div>
                 </div>
-              </div>
-              <div className="mb-8">
-                <h4 className="text-sm uppercase tracking-wider text-slate-400 font-bold mb-3 flex items-center gap-2">
-                  <FileText className="w-4 h-4" /> Professional Bio
-                </h4>
-                <p className="text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-100">
-                  {selectedDoctor.bio}
-                </p>
-              </div>
-              <div>
-                <h4 className="text-sm uppercase tracking-wider text-slate-400 font-bold mb-3 flex items-center gap-2">
-                  <Award className="w-4 h-4" /> Certifications
-                </h4>
-                <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
-                  {selectedDoctor.certificates.map((cert, idx) => (
-                    <div key={idx} className="flex-none w-48 h-32 bg-slate-100 border border-slate-200 rounded-lg flex flex-col items-center justify-center p-4 text-center snap-center hover:bg-slate-200 transition cursor-pointer">
-                      <FileText className="w-8 h-8 text-slate-300 mb-2" />
-                      <span className="text-xs font-medium text-slate-500">{cert}</span>
-                    </div>
-                  ))}
+              </section>
+
+              {/* Trust Wall (Certificates) */}
+              <section className="py-16 bg-slate-50">
+                <div className="container mx-auto px-4">
+                  <div className="text-center mb-10">
+                    <h2 className="text-3xl font-bold text-slate-800">{t.trust_wall.title}</h2>
+                    <p className="text-slate-500">{t.trust_wall.subtitle}</p>
+                  </div>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {t.trust_wall.certs.map((cert, idx) => (
+                      <div key={idx} className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm flex flex-col items-center text-center hover:border-teal-400 transition">
+                        <div className="text-slate-400 mb-4 scale-150">{cert.icon}</div>
+                        <h3 className="font-bold text-slate-800 mb-1">{cert.title}</h3>
+                        <p className="text-xs text-slate-500 font-medium uppercase tracking-wide">{cert.issuer}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-              <div className="mt-8 pt-6 border-t border-slate-100">
-                <a 
-                  href="#appointment" 
-                  onClick={() => setSelectedDoctor(null)}
-                  className={`block w-full text-center py-4 rounded-xl font-bold text-white shadow-lg hover:opacity-90 transition ${selectedDoctor.id === 'rashmi' ? 'bg-teal-600' : 'bg-blue-600'}`}
-                >
-                  Book Appointment with {selectedDoctor.name.split(" ")[1]}
-                </a>
-              </div>
+              </section>
+
+              {/* Doctors Section (Interactive) */}
+              <section id="doctors" className="py-20 bg-white">
+                <div className="container mx-auto px-4">
+                  <div className="text-center mb-16">
+                    <h2 className="text-3xl font-bold text-slate-800 mb-4">{t.doctors.title}</h2>
+                    <p className="text-slate-500 mb-4">{t.doctors.subtitle}</p>
+                    <div className="w-20 h-1 bg-teal-500 mx-auto rounded-full"></div>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-8 md:gap-12 max-w-5xl mx-auto">
+                     {/* Dr. Rashmi Card */}
+                    <div 
+                      onClick={() => setSelectedDoctor(t.doctors.rashmi)}
+                      className="group bg-slate-50 rounded-2xl p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2 cursor-pointer transition-all duration-300 flex flex-col items-center text-center relative overflow-hidden"
+                    >
+                      <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-teal-400 to-teal-600 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+                      <div className="w-32 h-32 bg-teal-200 rounded-full mb-6 overflow-hidden flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300 border-4 border-white">
+                        <img 
+                          src={t.doctors.rashmi.image} 
+                          alt={t.doctors.rashmi.name}
+                          className="w-full h-full object-cover rounded-full"
+                          onError={(e) => {e.target.style.display='none'; e.target.parentNode.classList.add('flex', 'items-center', 'justify-center'); e.target.parentNode.innerHTML = '<span class="text-teal-700 text-3xl font-bold">DR</span>'}}
+                        />
+                      </div>
+                      <h3 className="text-2xl font-bold text-slate-800 group-hover:text-teal-700 transition-colors">{t.doctors.rashmi.name}</h3>
+                      <p className="text-teal-600 font-medium mb-2">{t.doctors.rashmi.title}</p>
+                      <div className="bg-white px-4 py-2 rounded-lg border border-slate-200 text-sm text-slate-600 mt-2 shadow-sm">
+                        <p className="font-semibold">{t.doctors.rashmi.qual}</p>
+                      </div>
+                      <div className="mt-4 flex gap-2 flex-wrap justify-center">
+                        {t.doctors.rashmi.badges.slice(0,1).map((b,i) => (
+                           <span key={i} className="inline-flex items-center gap-1 bg-teal-50 text-teal-700 text-xs px-2 py-1 rounded-full border border-teal-100">
+                            {b.icon} {b.text}
+                          </span>
+                        ))}
+                      </div>
+                      <button className="mt-6 text-teal-600 font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+                        View Profile <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* Dr. Arunendra Card */}
+                    <div 
+                      onClick={() => setSelectedDoctor(t.doctors.arunendra)}
+                      className="group bg-slate-50 rounded-2xl p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2 cursor-pointer transition-all duration-300 flex flex-col items-center text-center relative overflow-hidden"
+                    >
+                      <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 to-blue-600 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+                      <div className="w-32 h-32 bg-blue-200 rounded-full mb-6 overflow-hidden flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300 border-4 border-white">
+                        <img 
+                          src={t.doctors.arunendra.image} 
+                          alt={t.doctors.arunendra.name}
+                          className="w-full h-full object-cover rounded-full"
+                          onError={(e) => {e.target.style.display='none'; e.target.parentNode.classList.add('flex', 'items-center', 'justify-center'); e.target.parentNode.innerHTML = '<span class="text-blue-700 text-3xl font-bold">DR</span>'}}
+                        />
+                      </div>
+                      <h3 className="text-2xl font-bold text-slate-800 group-hover:text-blue-700 transition-colors">{t.doctors.arunendra.name}</h3>
+                      <p className="text-blue-600 font-medium mb-2">{t.doctors.arunendra.title}</p>
+                      <div className="bg-white px-4 py-2 rounded-lg border border-slate-200 text-sm text-slate-600 mt-2 shadow-sm">
+                        <p className="font-semibold">{t.doctors.arunendra.qual}</p>
+                      </div>
+                       <div className="mt-4 flex gap-2 flex-wrap justify-center">
+                         {t.doctors.arunendra.badges.slice(0,1).map((b,i) => (
+                           <span key={i} className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded-full border border-blue-100">
+                            {b.icon} {b.text}
+                          </span>
+                        ))}
+                      </div>
+                      <button className="mt-6 text-blue-600 font-semibold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+                        View Profile <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Technology Showcase */}
+              <section id="tech" className="py-16 bg-slate-900 text-white">
+                <div className="container mx-auto px-4">
+                  <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+                    <div>
+                      <h2 className="text-3xl font-bold mb-2">{t.tech.title}</h2>
+                      <div className="w-16 h-1 bg-teal-500 rounded-full"></div>
+                    </div>
+                    {/* Virtual Tour Placeholder */}
+                    <div className="text-sm font-medium bg-slate-800 px-4 py-2 rounded-lg flex items-center gap-2">
+                      <Activity className="w-4 h-4 text-teal-400" /> Clinic Virtual Tour Coming Soon
+                    </div>
+                  </div>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {t.tech.items.map((item, idx) => (
+                      <div key={idx} className="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-teal-500 transition group">
+                        <div className="bg-slate-700 p-3 rounded-full w-fit mb-4 group-hover:bg-teal-500 transition-colors">
+                          {React.cloneElement(item.icon, { className: "w-6 h-6 text-white" })}
+                        </div>
+                        <h3 className="text-lg font-bold mb-1">{item.name}</h3>
+                        <p className="text-slate-400 text-sm">{item.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              {/* Services Tabs & Premium Differentiators */}
+              <section id="services" className="py-20 bg-slate-50">
+                <div className="container mx-auto px-4">
+                  <h2 className="text-3xl font-bold text-center text-slate-800 mb-10">{t.services.title}</h2>
+                  
+                  <div className="flex justify-center mb-10">
+                    <div className="bg-white p-1 rounded-xl shadow-sm inline-flex">
+                      <button 
+                        onClick={() => setActiveServiceTab('skin')}
+                        className={`px-6 py-3 rounded-lg text-sm md:text-base font-semibold transition flex items-center gap-2 ${activeServiceTab === 'skin' ? 'bg-teal-600 text-white shadow' : 'text-slate-600 hover:bg-slate-50'}`}
+                      >
+                        <Sparkles className="w-4 h-4" /> {t.services.tab_skin}
+                      </button>
+                      <button 
+                        onClick={() => setActiveServiceTab('dental')}
+                        className={`px-6 py-3 rounded-lg text-sm md:text-base font-semibold transition flex items-center gap-2 ${activeServiceTab === 'dental' ? 'bg-blue-600 text-white shadow' : 'text-slate-600 hover:bg-slate-50'}`}
+                      >
+                        <Smile className="w-4 h-4" /> {t.services.tab_dental}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-16">
+                    {activeServiceTab === 'skin' 
+                      ? t.services.skin_list.map((item, idx) => (
+                          <div key={idx} className="bg-white p-5 rounded-xl border-l-4 border-teal-500 shadow-sm hover:shadow-md transition flex items-center gap-4">
+                            <CheckCircle className="w-5 h-5 text-teal-500 flex-shrink-0" />
+                            <span className="font-medium text-slate-700">{item}</span>
+                          </div>
+                        ))
+                      : t.services.dental_list.map((item, idx) => (
+                          <div key={idx} className="bg-white p-5 rounded-xl border-l-4 border-blue-500 shadow-sm hover:shadow-md transition flex items-center gap-4">
+                            <CheckCircle className="w-5 h-5 text-blue-500 flex-shrink-0" />
+                            <span className="font-medium text-slate-700">{item}</span>
+                          </div>
+                        ))
+                    }
+                  </div>
+
+                  {/* Premium Differentiators (Dental Specific usually) */}
+                  {activeServiceTab === 'dental' && (
+                    <div className="max-w-5xl mx-auto space-y-8 animate-in slide-in-from-bottom duration-500">
+                      
+                      {/* Braces Comparison */}
+                      <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-200">
+                        <div className="bg-blue-600 p-4 text-white font-bold text-center">
+                          {t.premium.braces.title}
+                        </div>
+                        <div className="grid grid-cols-2 divide-x divide-slate-100">
+                          <div className="p-6 text-center">
+                            <div className="text-xl font-bold text-slate-800 mb-4">{t.premium.braces.aligner}</div>
+                            <ul className="space-y-3 text-sm text-slate-600">
+                              <li className="flex items-center justify-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> {t.premium.braces.feat1}</li>
+                              <li className="flex items-center justify-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> {t.premium.braces.feat2}</li>
+                              <li className="flex items-center justify-center gap-2"><CheckCircle className="w-4 h-4 text-green-500" /> {t.premium.braces.feat3}</li>
+                            </ul>
+                          </div>
+                          <div className="p-6 text-center bg-slate-50 opacity-70">
+                            <div className="text-xl font-bold text-slate-500 mb-4">{t.premium.braces.metal}</div>
+                            <ul className="space-y-3 text-sm text-slate-400">
+                              <li className="flex items-center justify-center gap-2"><X className="w-4 h-4 text-red-400" /> Visible</li>
+                              <li className="flex items-center justify-center gap-2"><X className="w-4 h-4 text-red-400" /> Fixed</li>
+                              <li className="flex items-center justify-center gap-2"><X className="w-4 h-4 text-red-400" /> Diet Limits</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Wisdom Tooth & Laser Cards */}
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div className="bg-red-50 p-6 rounded-2xl border border-red-100">
+                           <h3 className="text-lg font-bold text-red-900 mb-2">{t.premium.wisdom.title}</h3>
+                           <p className="text-red-700 text-sm mb-4">{t.premium.wisdom.desc}</p>
+                           <span className="bg-white text-red-600 text-xs font-bold px-3 py-1 rounded-full shadow-sm">{t.premium.wisdom.badge}</span>
+                        </div>
+                        <div className="bg-purple-50 p-6 rounded-2xl border border-purple-100">
+                           <h3 className="text-lg font-bold text-purple-900 mb-2">Oral Cancer Screening</h3>
+                           <p className="text-purple-700 text-sm mb-4">Life-saving preventive checks. FDI World Dental certified protocols.</p>
+                           <span className="bg-white text-purple-600 text-xs font-bold px-3 py-1 rounded-full shadow-sm">Early Detection Saves Lives</span>
+                        </div>
+                      </div>
+
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              {/* Community Timeline */}
+              <section className="py-16 bg-white border-y border-slate-100">
+                 <div className="container mx-auto px-4 max-w-4xl">
+                    <h2 className="text-2xl font-bold text-center mb-10">{t.timeline.title}</h2>
+                    <div className="relative border-l-2 border-teal-200 ml-4 md:ml-0 md:pl-8 space-y-8">
+                       {t.timeline.events.map((evt, idx) => (
+                         <div key={idx} className="relative pl-6 md:pl-0">
+                            <div className="absolute -left-[31px] md:-left-[41px] bg-teal-500 w-4 h-4 rounded-full border-4 border-white shadow"></div>
+                            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4">
+                               <span className="text-sm font-bold text-teal-600 bg-teal-50 px-2 py-1 rounded w-fit">{evt.year}</span>
+                               <span className="text-lg font-medium text-slate-800">{evt.event}</span>
+                            </div>
+                         </div>
+                       ))}
+                    </div>
+                 </div>
+              </section>
+
+              {/* Locations */}
+              <section id="locations" className="py-20 bg-slate-50">
+                <div className="container mx-auto px-4">
+                  <div className="text-center mb-12">
+                    <h2 className="text-3xl font-bold text-slate-800">{t.locations.title}</h2>
+                  </div>
+                  <div className="grid lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                     {/* Maihar */}
+                     <div className="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-teal-500">
+                        <div className="flex items-start gap-4 mb-4">
+                          <div className="bg-teal-100 p-3 rounded-full"><MapPin className="text-teal-600" /></div>
+                          <div>
+                            <h3 className="text-xl font-bold">{t.locations.maihar.name}</h3>
+                            <p className="text-slate-600 font-medium">{t.locations.maihar.addr}</p>
+                          </div>
+                        </div>
+                        <button className="w-full py-3 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 transition flex items-center justify-center gap-2">
+                          <Navigation className="w-4 h-4" /> {t.locations.maihar.action}
+                        </button>
+                     </div>
+                     {/* Satna */}
+                     <div className="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-blue-500">
+                        <div className="flex items-start gap-4 mb-4">
+                          <div className="bg-blue-100 p-3 rounded-full"><MapPin className="text-blue-600" /></div>
+                          <div>
+                            <h3 className="text-xl font-bold">{t.locations.satna.name}</h3>
+                            <p className="text-slate-600 font-medium">{t.locations.satna.addr}</p>
+                          </div>
+                        </div>
+                        <button className="w-full py-3 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 transition flex items-center justify-center gap-2">
+                          <Navigation className="w-4 h-4" /> {t.locations.satna.action}
+                        </button>
+                     </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Footer */}
+              <footer className="bg-slate-900 text-slate-400 py-12 mb-10 md:mb-0">
+                <div className="container mx-auto px-4 text-center">
+                  <h2 className="text-2xl font-bold text-white mb-4">Dr. Rashmi's Clinic</h2>
+                  <div className="flex justify-center gap-6 mb-8">
+                    <a 
+                      href="https://www.facebook.com/people/DRRASHMIs-Skin-Cosmetic-Hair-Laser-Dental-Clinic/100063725846182/" 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="hover:text-white transition"
+                      aria-label="Visit Facebook Page"
+                    >
+                      <Facebook />
+                    </a>
+                    <a href="#" className="hover:text-white transition" aria-label="Visit Instagram Page">
+                      <Instagram />
+                    </a>
+                  </div>
+                  <p className="text-sm">&copy; 2025 Dr. Rashmi's Clinic. All rights reserved.</p>
+                </div>
+              </footer>
+
+              {/* Sticky Sunday Bar */}
+              {showSundayBar && (
+                <div className="fixed bottom-0 left-0 w-full bg-green-700 text-white py-3 px-4 text-center font-bold z-50 flex justify-between items-center md:justify-center gap-4 shadow-lg">
+                   <div className="flex items-center gap-2">
+                     <Calendar className="w-5 h-5" /> {t.locations.sunday}
+                   </div>
+                   <button onClick={() => setShowSundayBar(false)} className="md:absolute md:right-4 opacity-80 hover:opacity-100">
+                     <X className="w-5 h-5" />
+                   </button>
+                </div>
+              )}
+
+              {/* Doctor Modal */}
+              {selectedDoctor && (
+                <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center">
+                  <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedDoctor(null)}></div>
+                  <div className="relative bg-white w-full md:w-[700px] md:rounded-2xl rounded-t-2xl shadow-2xl max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom duration-300">
+                    <div className="sticky top-0 bg-white border-b border-slate-100 p-4 flex justify-between items-center z-10">
+                      <h3 className="text-lg font-bold text-slate-800">Physician Profile</h3>
+                      <button onClick={() => setSelectedDoctor(null)} className="p-2 hover:bg-slate-100 rounded-full transition">
+                        <X className="w-6 h-6 text-slate-500" />
+                      </button>
+                    </div>
+                    <div className="p-6 md:p-8">
+                      <div className="flex flex-col md:flex-row gap-6 items-center md:items-start mb-8">
+                        <div className={`w-28 h-28 rounded-full flex-shrink-0 flex items-center justify-center text-3xl font-bold text-white shadow-lg overflow-hidden border-4 border-white ${selectedDoctor.id === 'rashmi' ? 'bg-teal-500' : 'bg-blue-600'}`}>
+                          <img 
+                            src={selectedDoctor.image} 
+                            alt={selectedDoctor.name} 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {e.target.style.display='none'; e.target.parentNode.classList.add('flex', 'items-center', 'justify-center'); e.target.parentNode.innerHTML = selectedDoctor.name.split(" ")[1][0] + selectedDoctor.name.split(" ")[2][0]}}
+                          />
+                        </div>
+                        <div className="text-center md:text-left">
+                          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">{selectedDoctor.name}</h2>
+                          <p className={`text-lg font-medium mb-1 ${selectedDoctor.id === 'rashmi' ? 'text-teal-600' : 'text-blue-600'}`}>{selectedDoctor.title}</p>
+                          <p className="text-slate-500">{selectedDoctor.qual}</p>
+                          <div className="flex flex-wrap gap-2 mt-4 justify-center md:justify-start">
+                            {selectedDoctor.badges.map((badge, idx) => (
+                              <span key={idx} className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${badge.color}`}>
+                                {badge.icon} {badge.text}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mb-8">
+                        <h4 className="text-sm uppercase tracking-wider text-slate-400 font-bold mb-3 flex items-center gap-2">
+                          <FileText className="w-4 h-4" /> Professional Bio
+                        </h4>
+                        <p className="text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-100">
+                          {selectedDoctor.bio}
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="text-sm uppercase tracking-wider text-slate-400 font-bold mb-3 flex items-center gap-2">
+                          <Award className="w-4 h-4" /> Certifications
+                        </h4>
+                        <div className="flex gap-4 overflow-x-auto pb-4 snap-x">
+                          {selectedDoctor.certificates.map((cert, idx) => (
+                            <div key={idx} className="flex-none w-48 h-32 bg-slate-100 border border-slate-200 rounded-lg flex flex-col items-center justify-center p-4 text-center snap-center hover:bg-slate-200 transition cursor-pointer">
+                              <FileText className="w-8 h-8 text-slate-300 mb-2" />
+                              <span className="text-xs font-medium text-slate-500">{cert}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="mt-8 pt-6 border-t border-slate-100">
+                        <a 
+                          href="#appointment" 
+                          onClick={() => setSelectedDoctor(null)}
+                          className={`block w-full text-center py-4 rounded-xl font-bold text-white shadow-lg hover:opacity-90 transition ${selectedDoctor.id === 'rashmi' ? 'bg-teal-600' : 'bg-blue-600'}`}
+                        >
+                          Book Appointment with {selectedDoctor.name.split(" ")[1]}
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
             </div>
-          </div>
-        </div>
-      )}
+          );
+        };
 
-    </div>
-  );
-};
-
-export default App;
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
